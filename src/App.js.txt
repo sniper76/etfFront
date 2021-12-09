@@ -1,0 +1,225 @@
+import React from "react";
+import { Grid, Box, TextField, Button, AppBar, Toolbar, Container, Typography } from "@mui/material";
+import { DataGrid } from '@mui/x-data-grid';
+import axios from 'axios';
+import CssBaseline from '@mui/material/CssBaseline';
+import { createTheme } from '@mui/material/styles';
+import { ThemeProvider, makeStyles } from '@mui/styles';
+import GitHubIcon from '@mui/icons-material/GitHub';
+import FacebookIcon from '@mui/icons-material/Facebook';
+import TwitterIcon from '@mui/icons-material/Twitter';
+import Header from './Header';
+import MainFeaturedPost from './MainFeaturedPost';
+import FeaturedPost from './FeaturedPost';
+import Main from './Main';
+import Sidebar from './Sidebar';
+import Footer from './Footer';
+import post1 from './blog-post.1.md';
+import post2 from './blog-post.2.md';
+import post3 from './blog-post.3.md';
+
+const columns = [
+  { field: 'stk_NM_KOR', headerName: '주식명', width: 250 },
+  { field: 'stk_NM_CNT', headerName: '편입횟수', width: 250 }
+];
+/*
+const rows = [
+  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 35 },
+  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 42 },
+  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 45 },
+  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 16 },
+  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
+  { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
+  { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
+  { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
+  { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
+];*/
+/*
+const useStyles = makeStyles(theme => ({
+  container: {
+    background: theme.palette.success.main
+  }
+}));
+*/
+const sections = [
+  { title: 'Technology', url: '#' },
+  { title: 'Design', url: '#' },
+  { title: 'Culture', url: '#' },
+  { title: 'Business', url: '#' },
+  { title: 'Politics', url: '#' },
+  { title: 'Opinion', url: '#' },
+  { title: 'Science', url: '#' },
+  { title: 'Health', url: '#' },
+  { title: 'Style', url: '#' },
+  { title: 'Travel', url: '#' },
+];
+
+const mainFeaturedPost = {
+  title: 'Title of a longer featured blog post',
+  description:
+    "Multiple lines of text that form the lede, informing new readers quickly and efficiently about what's most interesting in this post's contents.",
+  image: 'https://source.unsplash.com/random',
+  imageText: 'main image description',
+  linkText: 'Continue reading…',
+};
+
+const featuredPosts = [
+  {
+    title: 'Featured post',
+    date: 'Nov 12',
+    description:
+      'This is a wider card with supporting text below as a natural lead-in to additional content.',
+    image: 'https://source.unsplash.com/random',
+    imageLabel: 'Image Text',
+  },
+  {
+    title: 'Post title',
+    date: 'Nov 11',
+    description:
+      'This is a wider card with supporting text below as a natural lead-in to additional content.',
+    image: 'https://source.unsplash.com/random',
+    imageLabel: 'Image Text',
+  },
+];
+
+const posts = [post1, post2, post3];
+
+const sidebar = {
+  title: 'About',
+  description:
+    'Etiam porta sem malesuada magna mollis euismod. Cras mattis consectetur purus sit amet fermentum. Aenean lacinia bibendum nulla sed consectetur.',
+  archives: [
+    { title: 'March 2020', url: '#' },
+    { title: 'February 2020', url: '#' },
+    { title: 'January 2020', url: '#' },
+    { title: 'November 1999', url: '#' },
+    { title: 'October 1999', url: '#' },
+    { title: 'September 1999', url: '#' },
+    { title: 'August 1999', url: '#' },
+    { title: 'July 1999', url: '#' },
+    { title: 'June 1999', url: '#' },
+    { title: 'May 1999', url: '#' },
+    { title: 'April 1999', url: '#' },
+  ],
+  social: [
+    { name: 'GitHub', icon: GitHubIcon },
+    { name: 'Twitter', icon: TwitterIcon },
+    { name: 'Facebook', icon: FacebookIcon },
+  ],
+};
+
+const theme = createTheme();
+
+function App() {/*
+  const [sortModel, setSortModel] = React.useState([
+    {
+      field: 'age',
+      sort: 'asc',
+    },
+  ]);*/
+  // const [page, setPage] = React.useState(0);
+  const [rowData, setRowData] = React.useState([]);
+  const [loading, setLoading] = React.useState(false);
+
+  const onClick = () => {
+    // console.log('onClick', this);
+    setLoading(true);
+    axios.post('http://localhost:8088/search', {
+      result: 'blabla',
+      data: 'blabla'
+    }).then(function (response) {
+      // response Action
+      console.log('response', response);
+      setRowData(response.data);
+  }).finally(() => {
+    setLoading(false);
+  });
+  };
+
+  const onKeyPress = (e) => {
+    // console.log('onKeyPress', e);
+    if(e.key === 'Enter') {
+      onClick();
+    }
+  };
+  // const classes = useStyles();
+
+  return (
+  <ThemeProvider theme={theme}>
+    <CssBaseline />
+    <Container maxWidth="lg">
+      <Header title="Blog" sections={sections} />
+      <main>
+        <MainFeaturedPost post={mainFeaturedPost} />
+        <Grid container spacing={4}>
+          {featuredPosts.map((post) => (
+            <FeaturedPost key={post.title} post={post} />
+          ))}
+        </Grid>
+        <Grid container spacing={5} sx={{ mt: 3 }}>
+          <Main title="From the firehose" posts={posts} />
+          <Sidebar
+            title={sidebar.title}
+            description={sidebar.description}
+            archives={sidebar.archives}
+            social={sidebar.social}
+          />
+        </Grid>
+      </main>
+    </Container>
+    <Footer
+      title="Footer"
+      description="Something here to give the footer a purpose!"
+    />
+  </ThemeProvider>
+  /*
+    <div>
+    <AppBar position="static">
+        <Toolbar>
+          <Typography component="h2" variant="h2">
+            Material UI Containers & Grids
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <Typography componet="h2" variant="h5" gutterBottom>
+    <TextField id="outlined-basic" label="ETF명" variant="outlined" inputProps={{ maxLength: 50 }} onKeyPress={onKeyPress} />
+    <Button variant="contained" onClick={onClick}>검색</Button>
+    <div style={{ height: 400, width: '100%' }} className={classes.root}>
+      <DataGrid
+      getRowId={(r) => r.stk_NM_KOR}
+        rows={rowData}
+        columns={columns}
+        loading={loading}
+        // sortModel={sortModel}
+        // onSortModelChange={(model) => setSortModel(model)}
+      />
+      </div>
+      </Typography>
+      <AppBar position="static" color="primary">
+          <Container maxWidth="md">
+            <Toolbar>
+              <Typography variant="body1" color="inherit">
+                © 2019 Gistia
+              </Typography>
+            </Toolbar>
+          </Container>
+        </AppBar>
+      </div>*//*
+    <Grid container spacing={1}>
+    <Grid item xs={12} md={12} xl={12}>
+      <Box bgcolor="info.main" color="info.contrastText">
+        상단광고영역
+      </Box>
+    </Grid>
+    <Grid item xs={12}>
+    </Grid>
+    <Grid item xs={12}>
+      <Box bgcolor="info.main" color="info.contrastText">
+        하단정보영역
+      </Box>
+    </Grid>
+  </Grid>*/
+  );
+}
+
+export default App;
