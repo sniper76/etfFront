@@ -7,6 +7,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import { createTheme } from '@mui/material/styles';
 import { ThemeProvider } from '@mui/styles';
 import Footer from './Footer';
+import Header from './Header';
 import MainFeaturedPost from './MainFeaturedPost';
 import CircularIndeterminate from "./CircularIndeterminate";
 import RowRadioButtonsGroup from "./RowRadioButtonsGroup";
@@ -34,11 +35,11 @@ const useStyles = makeStyles(theme => ({
     background: theme.palette.success.main
   }
 }));
-const sections = [
-  { title: 'ETF검색', url: '#' },
-  { title: 'Design', url: '#' }
-];
 */
+const sections = [
+  { title: 'ETF검색', url: '/' },
+  { title: 'Stock', url: '/stock' }
+];
 /*
 const featuredPosts = [
   {
@@ -177,6 +178,7 @@ function App() {/*
   return (
     <ThemeProvider theme={theme}>
     <CssBaseline />
+    <Header title="ETF Search" sections={sections} />
     <Container maxWidth="lg">
       <main>
         <MainFeaturedPost post={mainFeaturedPost} />
