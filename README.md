@@ -9,3 +9,6 @@ In the project directory, you can run:
 ### `yarn start`
 
 react-scripts error -> npm update and yarn upgrade
+
+yarn run build
+.env.production

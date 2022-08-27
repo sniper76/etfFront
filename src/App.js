@@ -1,16 +1,31 @@
 import React from "react";
-import { Radio, RadioGroup, FormControlLabel, Snackbar, Grid, Box, Card, CardContent, CardActionArea, Toolbar, Container, Typography, InputBase, IconButton } from "@mui/material";
-import SearchIcon from '@mui/icons-material/Search';
-import CloseIcon from '@mui/icons-material/Close';
-import axios from 'axios';
-import CssBaseline from '@mui/material/CssBaseline';
-import { createTheme } from '@mui/material/styles';
-import { ThemeProvider } from '@mui/styles';
-import Footer from './Footer';
-import Header from './Header';
-import MainFeaturedPost from './MainFeaturedPost';
+import {
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  Snackbar,
+  Grid,
+  Box,
+  Card,
+  CardContent,
+  CardActionArea,
+  Toolbar,
+  Container,
+  Typography,
+  InputBase,
+  IconButton,
+} from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
+import CloseIcon from "@mui/icons-material/Close";
+import axios from "axios";
+import CssBaseline from "@mui/material/CssBaseline";
+import { createTheme } from "@mui/material/styles";
+import { ThemeProvider } from "@mui/styles";
+import Footer from "./Footer";
+import Header from "./Header";
+import MainFeaturedPost from "./MainFeaturedPost";
 import CircularIndeterminate from "./CircularIndeterminate";
-import RowRadioButtonsGroup from "./RowRadioButtonsGroup";
+// import RowRadioButtonsGroup from "./RowRadioButtonsGroup";
 // import GAdSense from "./AdSense";
 /*
 const columns = [
@@ -37,8 +52,8 @@ const useStyles = makeStyles(theme => ({
 }));
 */
 const sections = [
-  { title: 'ETF검색', url: '/' },
-  { title: 'Stock', url: '/stock' }
+  { title: "ETF검색", url: "/etf" },
+  { title: "Stock", url: "/" },
 ];
 /*
 const featuredPosts = [
@@ -61,20 +76,21 @@ const featuredPosts = [
 ];
 */
 const mainFeaturedPost = {
-  title: '국내 ETF 구성종목을 확인해보세요.',
+  title: "국내 ETF 구성종목을 확인해보세요.",
   description:
     "ETF 명칭을 입력하시면 해당 ETF의 구성종목별 건수를 확인하실 수 있습니다. 투자에 참고하시고 도움이 되셨다면 아래 계좌에 후원해주세요. 서버 유지비용에 도움에 됩니다.",
-  image: 'https://source.unsplash.com/random',
-  imageText: 'main image description',
-  linkText: '신한 110-190-608814',
+  image: "https://source.unsplash.com/random",
+  imageText: "main image description",
+  linkText: "신한 110-190-608814",
 };
 
 const theme = createTheme();
 
-require('dotenv').config();
+require("dotenv").config();
 // console.log(process.env.REACT_APP_API_URL);
 
-function App() {/*
+function App() {
+  /*
   const [sortModel, setSortModel] = React.useState([
     {
       field: 'age',
@@ -95,68 +111,73 @@ function App() {/*
   };
 
   const checkValidate = () => {
-    let names = ['KODEX','TIGER','KBSTAR','ARIRANG','KINDEX','HANARO'];
+    let names = ["KODEX", "TIGER", "KBSTAR", "ARIRANG", "KINDEX", "HANARO"];
     // console.log('length', searchText.length);
-    if(searchText.length < 2) {
+    if (searchText.length < 2) {
       setMessage("펀드명은 2자리 이상 입력해주세요.");
       handleClick();
       return false;
     }
     // console.log('name', names.filter(n => n === searchText));
-    if(names.filter(n => n === searchText).length > 0) {
-      setMessage("권장하지 않는 검색어입니다. KODEX,TIGER,KBSTAR,ARIRANG,KINDEX,HANARO");
+    if (names.filter((n) => n === searchText).length > 0) {
+      setMessage(
+        "권장하지 않는 검색어입니다. KODEX,TIGER,KBSTAR,ARIRANG,KINDEX,HANARO"
+      );
       handleClick();
       return false;
     }
     return true;
-  }
+  };
 
   const onClick = () => {
-    if(checkValidate()) {
+    if (checkValidate()) {
       // console.log('onClick', this);
       setLoading(true);
-      axios.post(process.env.REACT_APP_API_URL + '/search', {
-        result: valueRadio,
-        data: searchText
-      }).then(function (response) {
-        // response Action
-        console.log('response', response);
-        if(response.data) {
-          setRowData(response.data.etfList);        
-          setRowDataStock(response.data.stockList);
-        }
-        else {
-          console.log('error response', response);
-        }
-      }).finally(() => {
-        setLoading(false);
-      });
+      axios
+        .post(process.env.REACT_APP_API_URL + "/search", {
+          result: valueRadio,
+          data: searchText,
+        })
+        .then(function (response) {
+          // response Action
+          console.log("response", response);
+          if (response.data) {
+            setRowData(response.data.etfList);
+            setRowDataStock(response.data.stockList);
+          } else {
+            console.log("error response", response);
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     }
   };
 
   const onKeyPress = (e) => {
     //console.log('onKeyPress', e);
-    if(e.key === 'Enter') {
+    if (e.key === "Enter") {
       onClick();
     }
   };
-  
+
   const handleClick = () => {
     setOpen(true);
   };
 
   const handleClose = (event, reason) => {
-    if (reason === 'clickaway') {
+    if (reason === "clickaway") {
       return;
     }
 
     setOpen(false);
   };
-  
+
   const action = (
-    <React.Fragment>{/* <Button color="secondary" size="small" onClick={handleClose}>
+    <React.Fragment>
+      {/* <Button color="secondary" size="small" onClick={handleClose}>
     UNDO
-  </Button> */}      
+  </Button> */}
       <IconButton
         size="small"
         aria-label="close"
@@ -169,92 +190,126 @@ function App() {/*
   );
   // const classes = useStyles();
 
-    const [valueRadio, setValueRadio] = React.useState('2');
+  const [valueRadio, setValueRadio] = React.useState("2");
 
-    const handleRadioChange = (event) => {
-      setValueRadio(event.target.value);
-    };
+  const handleRadioChange = (event) => {
+    setValueRadio(event.target.value);
+  };
 
   return (
     <ThemeProvider theme={theme}>
-    <CssBaseline />
-    <Header title="ETF Search" sections={sections} />
-    <Container maxWidth="lg">
-      <main>
-        <MainFeaturedPost post={mainFeaturedPost} />
-        <Grid container>
-          <Grid item md={11}>
-          <RadioGroup row aria-label="gender" name="row-radio-buttons-group" value={valueRadio} onChange={handleRadioChange}>
-        <FormControlLabel value="1" control={<Radio />} label="국내시장지수" />
-        <FormControlLabel value="2" control={<Radio />} label="국내업종테마" />
-        <FormControlLabel value="3" control={<Radio />} label="국내파생" />
-        <FormControlLabel value="4" control={<Radio />} label="해외주식" />
-        <FormControlLabel value="5" control={<Radio />} label="원자재" />
-        <FormControlLabel value="6" control={<Radio />} label="채권" />
-        <FormControlLabel value="7" control={<Radio />} label="기타" />
-      </RadioGroup>
+      <CssBaseline />
+      <Header title="ETF Search" sections={sections} />
+      <Container maxWidth="lg">
+        <main>
+          <MainFeaturedPost post={mainFeaturedPost} />
+          <Grid container>
+            <Grid item md={11}>
+              <RadioGroup
+                row
+                aria-label="gender"
+                name="row-radio-buttons-group"
+                value={valueRadio}
+                onChange={handleRadioChange}
+              >
+                <FormControlLabel
+                  value="1"
+                  control={<Radio />}
+                  label="국내시장지수"
+                />
+                <FormControlLabel
+                  value="2"
+                  control={<Radio />}
+                  label="국내업종테마"
+                />
+                <FormControlLabel
+                  value="3"
+                  control={<Radio />}
+                  label="국내파생"
+                />
+                <FormControlLabel
+                  value="4"
+                  control={<Radio />}
+                  label="해외주식"
+                />
+                <FormControlLabel
+                  value="5"
+                  control={<Radio />}
+                  label="원자재"
+                />
+                <FormControlLabel value="6" control={<Radio />} label="채권" />
+                <FormControlLabel value="7" control={<Radio />} label="기타" />
+              </RadioGroup>
+            </Grid>
+            <Grid item md={4}>
+              <Toolbar sx={{ borderBottom: 1, borderColor: "divider" }}>
+                <InputBase
+                  sx={{ ml: 1, flex: 1 }}
+                  placeholder="ETF명칭입력"
+                  inputProps={{ "aria-label": "search google maps" }}
+                  onChange={onSearchTextChange}
+                  onKeyPress={onKeyPress}
+                />
+                <IconButton
+                  type="submit"
+                  sx={{ p: "10px" }}
+                  aria-label="search"
+                  onClick={onClick}
+                >
+                  <SearchIcon />
+                </IconButton>
+              </Toolbar>
+              <Snackbar
+                open={open}
+                autoHideDuration={5000}
+                onClose={handleClose}
+                message={message}
+                action={action}
+              />
+            </Grid>
           </Grid>
-          <Grid item md={4}>
-<Toolbar sx={{ borderBottom: 1, borderColor: 'divider' }}>
-<InputBase
-  sx={{ ml: 1, flex: 1 }}
-  placeholder="ETF명칭입력"
-  inputProps={{ 'aria-label': 'search google maps' }}
-  onChange={onSearchTextChange}
-  onKeyPress={onKeyPress}
-/>
-  <IconButton type="submit" sx={{ p: '10px' }} aria-label="search" onClick={onClick}>
-    <SearchIcon />
-  </IconButton>
-</Toolbar><Snackbar
-open={open}
-autoHideDuration={5000}
-onClose={handleClose}
-message={message}
-action={action}
-/>
-
+          {loading && <CircularIndeterminate />}
+          <Grid container spacing={4}>
+            <Grid item xs={12} md={6}>
+              <CardActionArea component="a" href="#">
+                <Card sx={{ display: "flex" }}>
+                  <CardContent sx={{ flex: 1 }}>
+                    <Typography component="h2" variant="h5">
+                      ETF명
+                    </Typography>
+                    {rowData.map((archive) => (
+                      <Box component="li" sx={{ mt: 1, typography: "body1" }}>
+                        {archive.itemcode} {archive.itemname}
+                      </Box>
+                    ))}
+                  </CardContent>
+                </Card>
+              </CardActionArea>
+            </Grid>
+            <Grid item xs={12} md={6}>
+              <CardActionArea component="a" href="#">
+                <Card sx={{ display: "flex" }}>
+                  <CardContent sx={{ flex: 1 }}>
+                    <Typography component="h2" variant="h5">
+                      종목명
+                    </Typography>
+                    {rowDataStock.map((archive) => (
+                      <Box component="li" sx={{ mt: 1, typography: "body1" }}>
+                        {archive.stk_NM_KOR} {archive.stk_NM_CNT}건
+                      </Box>
+                    ))}
+                  </CardContent>
+                </Card>
+              </CardActionArea>
+            </Grid>
           </Grid>
-        </Grid>
-    {loading && (<CircularIndeterminate />)}
-        <Grid container spacing={4}>
-    <Grid item xs={12} md={6}>
-      <CardActionArea component="a" href="#">
-        <Card sx={{ display: 'flex' }}>
-          <CardContent sx={{ flex: 1 }}>
-            <Typography component="h2" variant="h5">
-              ETF명
-            </Typography>            
-            {rowData.map((archive) => (
-              <Box component="li" sx={{ mt: 1, typography: 'body1' }}>{archive.itemcode} {archive.itemname}</Box>
-              ))}
-          </CardContent>
-        </Card>
-      </CardActionArea>
-    </Grid>    
-    <Grid item xs={12} md={6}>
-      <CardActionArea component="a" href="#">
-        <Card sx={{ display: 'flex' }}>
-          <CardContent sx={{ flex: 1 }}>
-            <Typography component="h2" variant="h5">
-              종목명
-            </Typography>
-              {rowDataStock.map((archive) => (
-              <Box component="li" sx={{ mt: 1, typography: 'body1' }}>{archive.stk_NM_KOR} {archive.stk_NM_CNT}건</Box>
-              ))}
-          </CardContent>
-        </Card>
-      </CardActionArea>
-    </Grid>
-        </Grid>
-      </main>
-    </Container>
-    <Footer
-      title="ourtown2017@gmail.com"
-      description="문의 및 건의내용은 메일로 주세요 제목은->[ETF문의]"
-    />
-  </ThemeProvider>
-  /*
+        </main>
+      </Container>
+      <Footer
+        title="ourtown2017@gmail.com"
+        description="문의 및 건의내용은 메일로 주세요 제목은->[ETF문의]"
+      />
+    </ThemeProvider> /*
     <div>
     <AppBar position="static">
         <Toolbar>
@@ -286,7 +341,7 @@ action={action}
             </Toolbar>
           </Container>
         </AppBar>
-      </div>*//*
+      </div>
     <Grid container spacing={1}>
     <Grid item xs={12} md={12} xl={12}>
       <Box bgcolor="info.main" color="info.contrastText">

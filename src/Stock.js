@@ -1,16 +1,22 @@
 import * as React from "react";
 import PropTypes from "prop-types";
 import axios from "axios";
-import { DataGrid } from "@mui/x-data-grid";
+import { DataGrid, GridRowParams } from "@mui/x-data-grid";
 import {
-  Button,
   Radio,
+  Button,
   RadioGroup,
   FormControlLabel,
   Grid,
+  Toolbar,
   Container,
+  InputBase,
+  IconButton,
+  TextField,
 } from "@mui/material";
+import SearchIcon from "@mui/icons-material/Search";
 import Header from "./Header";
+import MainFeaturedPost from "./MainFeaturedPost";
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme } from "@mui/material/styles";
 import { ThemeProvider, makeStyles } from "@mui/styles";
@@ -24,39 +30,123 @@ const useStyles = makeStyles((tm) => ({
 }));
 
 const sections = [
-  { title: "ETF검색", url: "/" },
-  { title: "Stock", url: "/stock" },
+  { title: "ETF검색", url: "/etf" },
+  { title: "Stock", url: "/" },
 ];
 
+const mainFeaturedPost = {
+  title: "국내 주식 배당종목을 확인해보세요.",
+  description:
+    "투자에 참고하시고 도움이 되셨다면 아래 계좌에 후원해주세요. 서버 유지비용에 도움에 됩니다.",
+  image: "https://source.unsplash.com/random",
+  imageText: "main image description",
+  linkText: "신한 110-190-608814",
+};
+
 function Stock(props) {
-  const { description, title } = props;
-  const classes = useStyles();
-  const columns = [
-    { field: "stk_NM_KOR", headerName: "주식명", width: 250 },
-    { field: "trd_DT", headerName: "코드", width: 250 },
-  ];
+  const { title } = props;
 
   const [valueRadio, setValueRadio] = useState("STK");
   const [rowDataStock, setRowDataStock] = useState([]);
   const [loading, setLoading] = React.useState(false);
+  const [searchText, setSearchText] = React.useState("");
+  const [searchRate, setSearchRate] = React.useState(0);
+
+  const classes = useStyles();
+  const columns = [
+    { field: "isu_ABBRV", headerName: "주식명", width: 250 },
+    { field: "isu_SRT_CD", headerName: "코드", width: 250 },
+    { field: "div_CNT", headerName: "배당횟수", width: 100 },
+    { field: "div_AVG", headerName: "배당평균", width: 100 },
+    { field: "clpr_20200319", headerName: "20/03/19(종)", width: 150 },
+    { field: "clpr_20220713", headerName: "22/07/13(종)", width: 150 },
+    {
+      field: "price",
+      headerName: "현재가",
+      width: 150,
+      renderCell: (params: GridRowParams) => {
+        const onClickButton = () => {
+          // console.log("onClickButton", params);
+          let searchValue = {
+            result: params.row.isu_SRT_CD,
+            data: valueRadio,
+          };
+          axios
+            .post(process.env.REACT_APP_API_URL + "/stock/toDay", searchValue)
+            .then(function (response) {
+              // response Action
+              console.log("response", response);
+              if (response.data) {
+                // params.value = response.data.result;
+                const newItems = rowDataStock.map((item) => {
+                  if (item.isu_SRT_CD === params.row.isu_SRT_CD) {
+                    return { ...item, price: response.data.result };
+                  }
+                  return item;
+                });
+                setRowDataStock(newItems);
+              } else {
+                console.log("error response", response);
+              }
+            })
+            .finally(() => {});
+        };
+
+        return (
+          <strong>
+            {params.value}
+            <Button
+              variant="contained"
+              size="small"
+              style={{ marginLeft: 16 }}
+              onClick={onClickButton}
+              tabIndex={params.hasFocus ? 0 : -1}
+            >
+              조회
+            </Button>
+          </strong>
+        );
+      },
+    },
+  ];
+
+  const onSearchTextChange = (e) => {
+    // console.log('onSearchTextChange', e.target.value);
+    setSearchText(e.target.value);
+  };
+
+  const onSearchRateChange = (e) => {
+    console.log("onSearchRateChange", e.target.value);
+    setSearchRate(e.target.value);
+  };
+
+  const onKeyPress = (e) => {
+    //console.log('onKeyPress', e);
+    if (e.key === "Enter") {
+      onClick();
+    }
+  };
 
   const handleRadioChange = (e, ee) => {
     setValueRadio(ee);
-    console.log("e, ee", e, ee);
+    // console.log("e, ee", e, ee);
   };
 
   const onClick = () => {
+    console.log("process.env.REACT_APP_API_URL", process.env.REACT_APP_API_URL);
     setLoading(true);
     axios
       .post(process.env.REACT_APP_API_URL + "/stock", {
         result: null,
         data: valueRadio,
+        searchText: searchText.length === 0 ? null : searchText,
+        searchRate: searchRate <= 0 ? null : searchRate,
       })
       .then(function (response) {
         // response Action
         console.log("response", response);
-        if (response.data) {
-          setRowDataStock(response.data.stockList);
+        if (response.data.krxList) {
+          setRowDataStock(response.data.krxList);
         } else {
           console.log("error response", response);
         }
@@ -71,43 +161,76 @@ function Stock(props) {
       <CssBaseline />
       <Header title={title} sections={sections} />
       <Container maxWidth="lg">
-        {description}
-        <Grid container>
-          <Grid item md={11}>
-            <RadioGroup
-              row
-              aria-label="gender"
-              name="row-radio-buttons-group"
-              value={valueRadio}
-              onChange={handleRadioChange}
-            >
-              <FormControlLabel value="STK" control={<Radio />} label="KOSPI" />
-              <FormControlLabel
-                value="KSQ"
-                control={<Radio />}
-                label="KOSDAQ"
-              />
-            </RadioGroup>
-            <Button variant="contained" onClick={onClick}>
-              검색
-            </Button>
+        <main>
+          <MainFeaturedPost post={mainFeaturedPost} />
+          <Grid container>
+            <Grid item md={11}>
+              <RadioGroup
+                row
+                aria-label="gender"
+                name="row-radio-buttons-group"
+                value={valueRadio}
+                onChange={handleRadioChange}
+              >
+                <FormControlLabel
+                  value="STK"
+                  control={<Radio />}
+                  label="KOSPI"
+                />
+                <FormControlLabel
+                  value="KSQ"
+                  control={<Radio />}
+                  label="KOSDAQ"
+                />
+              </RadioGroup>
+            </Grid>
+            <Grid item md={4}>
+              <Toolbar sx={{ borderBottom: 1, borderColor: "divider" }}>
+                <InputBase
+                  sx={{ ml: 1, flex: 1 }}
+                  placeholder="종목명"
+                  inputProps={{ "aria-label": "search google maps" }}
+                  onChange={onSearchTextChange}
+                  onKeyPress={onKeyPress}
+                />
+                <IconButton
+                  type="submit"
+                  sx={{ p: "10px" }}
+                  aria-label="search"
+                  onClick={onClick}
+                >
+                  <SearchIcon />
+                </IconButton>
+                <TextField
+                  type="number"
+                  InputProps={{
+                    inputProps: {
+                      max: 100,
+                      min: 0,
+                    },
+                  }}
+                  onChange={onSearchRateChange}
+                  label="배당평균"
+                />
+              </Toolbar>
+            </Grid>
+            <Grid item md={24}>
+              <div
+                style={{ height: 580, width: "100%" }}
+                className={classes.root}
+              >
+                <DataGrid
+                  getRowId={(r) => r.isu_SRT_CD}
+                  rows={rowDataStock}
+                  columns={columns}
+                  loading={loading}
+                  // sortModel={sortModel}
+                  // onSortModelChange={(model) => setSortModel(model)}
+                />
+              </div>
+            </Grid>
           </Grid>
-          <Grid item md={11}>
-            <div
-              style={{ height: 400, width: "100%" }}
-              className={classes.root}
-            >
-              <DataGrid
-                getRowId={(r) => r.trd_DT}
-                rows={rowDataStock}
-                columns={columns}
-                loading={loading}
-                // sortModel={sortModel}
-                // onSortModelChange={(model) => setSortModel(model)}
-              />
-            </div>
-          </Grid>
-        </Grid>
+        </main>
       </Container>
     </ThemeProvider>
   );
