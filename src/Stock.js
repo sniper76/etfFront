@@ -37,7 +37,7 @@ const sections = [
 const mainFeaturedPost = {
   title: "국내 주식 배당종목을 확인해보세요.",
   description:
-    "투자에 참고하시고 도움이 되셨다면 아래 계좌에 후원해주세요. 서버 유지비용에 도움에 됩니다.",
+    "투자에 참고하시고 도움이 되셨다면 아래 계좌에 후원해주세요. 서버 유지비용에 도움이 됩니다.",
   image: "https://source.unsplash.com/random",
   imageText: "main image description",
   linkText: "신한 110-190-608814",
@@ -54,12 +54,30 @@ function Stock(props) {
 
   const classes = useStyles();
   const columns = [
-    { field: "isu_ABBRV", headerName: "주식명", width: 250 },
-    { field: "isu_SRT_CD", headerName: "코드", width: 250 },
+    { field: "isu_ABBRV", headerName: "종목명", width: 200 },
+    {
+      field: "isu_SRT_CD",
+      headerName: "코드",
+      width: 200,
+      renderCell: (params: GridRowParams) => {
+        const naverUrl =
+          "https://finance.naver.com/item/main.naver?code=" + params.value;
+        return (
+          <a
+            key={params.value}
+            target="_blank"
+            rel="noreferrer"
+            href={naverUrl}
+          >
+            {params.value}
+          </a>
+        );
+      },
+    },
     { field: "div_CNT", headerName: "배당횟수", width: 100 },
     { field: "div_AVG", headerName: "배당평균", width: 100 },
-    { field: "clpr_20200319", headerName: "20/03/19(종)", width: 150 },
-    { field: "clpr_20220713", headerName: "22/07/13(종)", width: 150 },
+    { field: "clpr_20200319", headerName: "20/03/19(종)", width: 100 },
+    { field: "clpr_20220713", headerName: "22/07/13(종)", width: 100 },
     {
       field: "price",
       headerName: "현재가",
@@ -193,14 +211,6 @@ function Stock(props) {
                   onChange={onSearchTextChange}
                   onKeyPress={onKeyPress}
                 />
-                <IconButton
-                  type="submit"
-                  sx={{ p: "10px" }}
-                  aria-label="search"
-                  onClick={onClick}
-                >
-                  <SearchIcon />
-                </IconButton>
                 <TextField
                   type="number"
                   InputProps={{
@@ -212,9 +222,17 @@ function Stock(props) {
                   onChange={onSearchRateChange}
                   label="배당평균"
                 />
+                <IconButton
+                  type="submit"
+                  sx={{ p: "10px" }}
+                  aria-label="search"
+                  onClick={onClick}
+                >
+                  <SearchIcon />
+                </IconButton>
               </Toolbar>
             </Grid>
-            <Grid item md={24}>
+            <Grid item md={12}>
               <div
                 style={{ height: 580, width: "100%" }}
                 className={classes.root}

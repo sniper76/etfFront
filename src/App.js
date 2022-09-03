@@ -78,7 +78,7 @@ const featuredPosts = [
 const mainFeaturedPost = {
   title: "국내 ETF 구성종목을 확인해보세요.",
   description:
-    "ETF 명칭을 입력하시면 해당 ETF의 구성종목별 건수를 확인하실 수 있습니다. 투자에 참고하시고 도움이 되셨다면 아래 계좌에 후원해주세요. 서버 유지비용에 도움에 됩니다.",
+    "ETF 명칭을 입력하시면 해당 ETF의 구성종목별 건수를 확인하실 수 있습니다. 투자에 참고하시고 도움이 되셨다면 아래 계좌에 후원해주세요. 서버 유지비용에 도움이 됩니다.",
   image: "https://source.unsplash.com/random",
   imageText: "main image description",
   linkText: "신한 110-190-608814",
@@ -196,6 +196,33 @@ function App() {
     setValueRadio(event.target.value);
   };
 
+  const handleOnButtonClick = (etfCode) => {
+    console.log("handleOnButtonClick", etfCode);
+    if (checkValidate()) {
+      // console.log('onClick', this);
+      setLoading(true);
+      axios
+        .post(process.env.REACT_APP_API_URL + "/searchItem", {
+          result: valueRadio,
+          data: searchText,
+          searchText: etfCode,
+        })
+        .then(function (response) {
+          // response Action
+          console.log("response", response);
+          if (response.data) {
+            setRowData(response.data.etfList);
+            setRowDataStock(response.data.stockList);
+          } else {
+            console.log("error response", response);
+          }
+        })
+        .finally(() => {
+          setLoading(false);
+        });
+    }
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
@@ -278,7 +305,12 @@ function App() {
                       ETF명
                     </Typography>
                     {rowData.map((archive) => (
-                      <Box component="li" sx={{ mt: 1, typography: "body1" }}>
+                      <Box
+                        key={archive.itemcode}
+                        component="li"
+                        sx={{ mt: 1, typography: "body1" }}
+                        onClick={() => handleOnButtonClick(archive.itemcode)}
+                      >
                         {archive.itemcode} {archive.itemname}
                       </Box>
                     ))}
@@ -294,7 +326,11 @@ function App() {
                       종목명
                     </Typography>
                     {rowDataStock.map((archive) => (
-                      <Box component="li" sx={{ mt: 1, typography: "body1" }}>
+                      <Box
+                        key={archive.stk_NM_KOR}
+                        component="li"
+                        sx={{ mt: 1, typography: "body1" }}
+                      >
                         {archive.stk_NM_KOR} {archive.stk_NM_CNT}건
                       </Box>
                     ))}
