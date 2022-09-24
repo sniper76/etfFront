@@ -23,11 +23,11 @@ import { ThemeProvider, makeStyles } from "@mui/styles";
 import { useState } from "react";
 
 const theme = createTheme();
-const useStyles = makeStyles((tm) => ({
-  container: {
-    // background: tm.palette.success.main,
+const useStyles = makeStyles({
+  root: {
+    backgroundColor: "#BBDEFB",
   },
-}));
+});
 
 const sections = [
   { title: "ETF검색", url: "/etf" },
@@ -44,6 +44,7 @@ const mainFeaturedPost = {
 };
 
 function Stock(props) {
+  // console.log("makestyles", makeStyles);
   const { title } = props;
 
   const [valueRadio, setValueRadio] = useState("STK");
@@ -53,12 +54,37 @@ function Stock(props) {
   const [searchRate, setSearchRate] = React.useState(0);
 
   const classes = useStyles();
+  console.log("classes", classes);
   const columns = [
-    { field: "isu_ABBRV", headerName: "종목명", width: 200 },
+    {
+      field: "isu_ABBRV",
+      headerName: "종목명",
+      width: 200,
+      cellClassName: (params: GridCellParams<number>) => {
+        if (
+          parseInt(params.row.clpr_20220713, 10) <
+          parseInt(params.row.clpr_DATE, 10)
+        ) {
+          // console.log("row", params.row);
+          return `${classes.root}`;
+        }
+        return "";
+      },
+    },
     {
       field: "isu_SRT_CD",
       headerName: "코드",
       width: 200,
+      cellClassName: (params: GridCellParams<number>) => {
+        if (
+          parseInt(params.row.clpr_20220713, 10) <
+          parseInt(params.row.clpr_DATE, 10)
+        ) {
+          // console.log("row", params.row);
+          return `${classes.root}`;
+        }
+        return "";
+      },
       renderCell: (params: GridRowParams) => {
         const naverUrl =
           "https://finance.naver.com/item/main.naver?code=" + params.value;
@@ -76,15 +102,41 @@ function Stock(props) {
     },
     { field: "div_CNT", headerName: "배당횟수", width: 100 },
     { field: "div_AVG", headerName: "배당평균", width: 100 },
-    { field: "clpr_20200319", headerName: "20/03/19(종)", width: 100 },
-    { field: "clpr_20220713", headerName: "22/07/13(종)", width: 100 },
+    {
+      field: "clpr_DATE",
+      headerName: "20/01/08(종)",
+      width: 100,
+      description: "코로나 폭락이전 비교일의 종가",
+    },
+    {
+      field: "clpr_20200319",
+      headerName: "20/03/19(종)",
+      width: 100,
+      description: "코로나 폭락일의 종가",
+    },
+    {
+      field: "clpr_20220713",
+      headerName: "22/07/13(종)",
+      width: 100,
+      description: "최근 최저 종가",
+    },
     {
       field: "price",
       headerName: "현재가",
       width: 150,
+      cellClassName: (params: GridCellParams<number>) => {
+        if (
+          parseInt(params.row.clpr_20220713, 10) <
+          parseInt(params.row.clpr_DATE, 10)
+        ) {
+          // console.log("row", params.row);
+          return `${classes.root}`;
+        }
+        return "";
+      },
       renderCell: (params: GridRowParams) => {
         const onClickButton = () => {
-          // console.log("onClickButton", params);
+          console.log("onClickButton", params);
           let searchValue = {
             result: params.row.isu_SRT_CD,
             data: valueRadio,
@@ -116,7 +168,7 @@ function Stock(props) {
             <Button
               variant="contained"
               size="small"
-              style={{ marginLeft: 16 }}
+              style={{ marginRight: 16 }}
               onClick={onClickButton}
               tabIndex={params.hasFocus ? 0 : -1}
             >
@@ -220,6 +272,7 @@ function Stock(props) {
                     },
                   }}
                   onChange={onSearchRateChange}
+                  onKeyPress={onKeyPress}
                   label="배당평균"
                 />
                 <IconButton
@@ -233,10 +286,7 @@ function Stock(props) {
               </Toolbar>
             </Grid>
             <Grid item md={12}>
-              <div
-                style={{ height: 580, width: "100%" }}
-                className={classes.root}
-              >
+              <div style={{ height: 580, width: "100%" }}>
                 <DataGrid
                   getRowId={(r) => r.isu_SRT_CD}
                   rows={rowDataStock}
