@@ -62,8 +62,8 @@ function Stock(props) {
       width: 200,
       cellClassName: (params: GridCellParams<number>) => {
         if (
-          parseInt(params.row.clpr_20220713, 10) <
-          parseInt(params.row.clpr_DATE, 10)
+          parseInt(params.row.clpr_DATE, 10) <
+          parseInt(params.row.clpr_20200108, 10)
         ) {
           // console.log("row", params.row);
           return `${classes.root}`;
@@ -77,8 +77,8 @@ function Stock(props) {
       width: 200,
       cellClassName: (params: GridCellParams<number>) => {
         if (
-          parseInt(params.row.clpr_20220713, 10) <
-          parseInt(params.row.clpr_DATE, 10)
+          parseInt(params.row.clpr_DATE, 10) <
+          parseInt(params.row.clpr_20200108, 10)
         ) {
           // console.log("row", params.row);
           return `${classes.root}`;
@@ -103,7 +103,7 @@ function Stock(props) {
     { field: "div_CNT", headerName: "배당횟수", width: 100 },
     { field: "div_AVG", headerName: "배당평균", width: 100 },
     {
-      field: "clpr_DATE",
+      field: "clpr_20200108",
       headerName: "20/01/08(종)",
       width: 100,
       description: "코로나 폭락이전 비교일의 종가",
@@ -121,13 +121,19 @@ function Stock(props) {
       description: "최근 최저 종가",
     },
     {
+      field: "clpr_DATE",
+      headerName: "최근 최저 종가",
+      width: 100,
+      description: "최근 최저 종가",
+    },
+    {
       field: "price",
       headerName: "현재가",
       width: 150,
       cellClassName: (params: GridCellParams<number>) => {
         if (
-          parseInt(params.row.clpr_20220713, 10) <
-          parseInt(params.row.clpr_DATE, 10)
+          parseInt(params.row.clpr_DATE, 10) <
+          parseInt(params.row.clpr_20200108, 10)
         ) {
           // console.log("row", params.row);
           return `${classes.root}`;
