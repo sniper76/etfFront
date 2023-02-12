@@ -54,6 +54,7 @@ const useStyles = makeStyles(theme => ({
 const sections = [
   { title: "ETF검색", url: "/etf" },
   { title: "Stock", url: "/" },
+  { title: "Stock종목비교", url: "/compare" },
 ];
 /*
 const featuredPosts = [
@@ -142,8 +143,8 @@ function App() {
           // response Action
           console.log("response", response);
           if (response.data) {
-            setRowData(response.data.etfList);
-            setRowDataStock(response.data.stockList);
+            setRowData(response?.data?.etfList ?? []);
+            setRowDataStock(response?.data?.stockList ?? []);
           } else {
             console.log("error response", response);
           }

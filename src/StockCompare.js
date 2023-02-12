@@ -44,7 +44,7 @@ const mainFeaturedPost = {
   linkText: "신한 110-190-608814",
 };
 
-function Stock(props) {
+function StockCompare(props) {
   // console.log("makestyles", makeStyles);
   const { title } = props;
 
@@ -58,34 +58,14 @@ function Stock(props) {
   console.log("classes", classes);
   const columns = [
     {
-      field: "isu_ABBRV",
+      field: "stockNm",
       headerName: "종목명",
       width: 200,
-      cellClassName: (params: GridCellParams<number>) => {
-        if (
-          parseInt(params.row.clpr_DATE, 10) <
-          parseInt(params.row.clpr_20200108, 10)
-        ) {
-          // console.log("row", params.row);
-          return `${classes.root}`;
-        }
-        return "";
-      },
     },
     {
-      field: "isu_SRT_CD",
+      field: "stockCd",
       headerName: "코드",
       width: 200,
-      cellClassName: (params: GridCellParams<number>) => {
-        if (
-          parseInt(params.row.clpr_DATE, 10) <
-          parseInt(params.row.clpr_20200108, 10)
-        ) {
-          // console.log("row", params.row);
-          return `${classes.root}`;
-        }
-        return "";
-      },
       renderCell: (params: GridRowParams) => {
         const naverUrl =
           "https://finance.naver.com/item/main.naver?code=" + params.value;
@@ -101,51 +81,69 @@ function Stock(props) {
         );
       },
     },
-    { field: "div_CNT", headerName: "배당횟수", width: 100 },
-    { field: "div_AVG", headerName: "배당평균", width: 100 },
     {
-      field: "clpr_20200108",
+      field: "price20200108",
       headerName: "20/01/08(종)",
       width: 100,
       description: "코로나 폭락이전 비교일의 종가",
+      renderCell: (params: GridRowParams) => {
+        return Intl.NumberFormat("ko-KR", {
+          maximumSignificantDigits: 3,
+        }).format(params.value);
+      },
     },
     {
-      field: "clpr_20200319",
+      field: "price20200319",
       headerName: "20/03/19(종)",
       width: 100,
       description: "코로나 폭락일의 종가",
+      renderCell: (params: GridRowParams) => {
+        return Intl.NumberFormat("ko-KR", {
+          maximumSignificantDigits: 3,
+        }).format(params.value);
+      },
     },
     {
-      field: "clpr_20220713",
+      field: "price20220713",
       headerName: "22/07/13(종)",
       width: 100,
       description: "최근 최저 종가",
+      renderCell: (params: GridRowParams) => {
+        return Intl.NumberFormat("ko-KR", {
+          maximumSignificantDigits: 3,
+        }).format(params.value);
+      },
     },
     {
-      field: "clpr_DATE",
-      headerName: "최근 최저 종가",
+      field: "price20220930",
+      headerName: "22/09/30(종)",
       width: 100,
       description: "최근 최저 종가",
+      renderCell: (params: GridRowParams) => {
+        return Intl.NumberFormat("ko-KR", {
+          maximumSignificantDigits: 3,
+        }).format(params.value);
+      },
+    },
+    {
+      field: "priceOneDayBefore",
+      headerName: "23/02/10(종)",
+      width: 150,
+      renderCell: (params: GridRowParams) => {
+        return Intl.NumberFormat("ko-KR", {
+          maximumSignificantDigits: 3,
+        }).format(params.value);
+      },
     },
     {
       field: "price",
-      headerName: "현재가",
+      headerName: "현재가조회",
       width: 150,
-      cellClassName: (params: GridCellParams<number>) => {
-        if (
-          parseInt(params.row.clpr_DATE, 10) <
-          parseInt(params.row.clpr_20200108, 10)
-        ) {
-          // console.log("row", params.row);
-          return `${classes.root}`;
-        }
-        return "";
-      },
       renderCell: (params: GridRowParams) => {
         const onClickButton = () => {
           console.log("onClickButton", params);
           let searchValue = {
-            result: params.row.isu_SRT_CD,
+            result: params.row.stockCd,
             data: valueRadio,
           };
           axios
@@ -156,7 +154,7 @@ function Stock(props) {
               if (response.data) {
                 // params.value = response.data.result;
                 const newItems = rowDataStock.map((item) => {
-                  if (item.isu_SRT_CD === params.row.isu_SRT_CD) {
+                  if (item.stockCd === params.row.stockCd) {
                     return { ...item, price: response.data.result };
                   }
                   return item;
@@ -171,7 +169,12 @@ function Stock(props) {
 
         return (
           <strong>
-            {params.value}
+            {params.value &&
+              Intl.NumberFormat("ko-KR", {
+                // style: "currency",
+                // currency: "KRW",
+                maximumSignificantDigits: 3,
+              }).format(params.value)}
             <Button
               variant="contained"
               size="small"
@@ -213,17 +216,17 @@ function Stock(props) {
     console.log("process.env.REACT_APP_API_URL", process.env.REACT_APP_API_URL);
     setLoading(true);
     axios
-      .post(process.env.REACT_APP_API_URL + "/stock", {
-        result: null,
-        data: valueRadio,
-        searchText: searchText.length === 0 ? null : searchText,
-        searchRate: searchRate <= 0 ? null : searchRate,
-      })
+      .get(
+        process.env.REACT_APP_API_URL +
+          "/getCompareStockData?mktId=" +
+          valueRadio,
+        {}
+      )
       .then(function (response) {
         // response Action
         console.log("response", response);
-        if (response.data.krxList) {
-          setRowDataStock(response.data.krxList);
+        if (response.data.compareStockList) {
+          setRowDataStock(response.data.compareStockList);
         } else {
           console.log("error response", response);
         }
@@ -263,25 +266,6 @@ function Stock(props) {
             </Grid>
             <Grid item md={4}>
               <Toolbar sx={{ borderBottom: 1, borderColor: "divider" }}>
-                <InputBase
-                  sx={{ ml: 1, flex: 1 }}
-                  placeholder="종목명"
-                  inputProps={{ "aria-label": "search google maps" }}
-                  onChange={onSearchTextChange}
-                  onKeyPress={onKeyPress}
-                />
-                <TextField
-                  type="number"
-                  InputProps={{
-                    inputProps: {
-                      max: 100,
-                      min: 0,
-                    },
-                  }}
-                  onChange={onSearchRateChange}
-                  onKeyPress={onKeyPress}
-                  label="배당평균"
-                />
                 <IconButton
                   type="submit"
                   sx={{ p: "10px" }}
@@ -295,7 +279,7 @@ function Stock(props) {
             <Grid item md={12}>
               <div style={{ height: 580, width: "100%" }}>
                 <DataGrid
-                  getRowId={(r) => r.isu_SRT_CD}
+                  getRowId={(r) => r.stockCd}
                   rows={rowDataStock}
                   columns={columns}
                   loading={loading}
@@ -311,9 +295,9 @@ function Stock(props) {
   );
 }
 
-Stock.propTypes = {
+StockCompare.propTypes = {
   description: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
 };
 
-export default Stock;
+export default StockCompare;
